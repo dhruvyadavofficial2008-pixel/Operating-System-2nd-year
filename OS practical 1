@@ -1,0 +1,92 @@
+from multiprocessing import Process, Semaphore, Lock, Array, Value
+import random
+import time
+
+BUFFER_SIZE = 5
+
+TOTAL_ITEMS = 10
+
+
+def producer(shared_buffer, write_pos, read_pos, empty_slots, filled_slots, lock):
+    for i in range(TOTAL_ITEMS):
+
+        item = random.randint(1, 100)
+
+        empty_slots.acquire()
+
+        lock.acquire()
+
+        position = write_pos.value
+        shared_buffer[position] = item
+
+        print(f"Producer -> Produced {item} at position {position}", flush=True)
+
+        write_pos.value = (position + 1) % BUFFER_SIZE
+
+        lock.release()
+
+        filled_slots.release()
+
+        time.sleep(random.uniform(0.2, 0.5))
+
+
+def consumer(shared_buffer, write_pos, read_pos, empty_slots, filled_slots, lock):
+
+    print("Consumer Started...", flush=True)
+
+    for i in range(TOTAL_ITEMS):
+
+        filled_slots.acquire()
+
+        lock.acquire()
+
+        position = read_pos.value
+        item = shared_buffer[position]
+
+        print(f"Consumer -> Consumed {item} from position {position}", flush=True)
+
+        read_pos.value = (position + 1) % BUFFER_SIZE
+
+        lock.release()
+
+        empty_slots.release()
+
+        time.sleep(random.uniform(0.2, 0.5))
+
+
+def main():
+
+    shared_buffer = Array('i', BUFFER_SIZE)
+
+    write_pos = Value('i', 0)
+    read_pos = Value('i', 0)
+
+    empty_slots = Semaphore(BUFFER_SIZE)
+    filled_slots = Semaphore(0)
+    lock = Lock()
+
+    print("Starting Producer and Consumer...\n")
+
+    producer_process = Process(
+        target=producer,
+        args=(shared_buffer, write_pos, read_pos,
+              empty_slots, filled_slots, lock)
+    )
+
+    consumer_process = Process(
+        target=consumer,
+        args=(shared_buffer, write_pos, read_pos,
+              empty_slots, filled_slots, lock)
+    )
+
+    producer_process.start()
+    consumer_process.start()
+
+    producer_process.join()
+    consumer_process.join()
+
+    print("\nExecution Completed Successfully.")
+
+
+if __name__ == "__main__":
+    main()
