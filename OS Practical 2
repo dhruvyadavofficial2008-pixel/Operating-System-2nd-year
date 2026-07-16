@@ -1,0 +1,56 @@
+from multiprocessing import Process, Queue
+import time
+import random
+
+# Producer Function
+def producer(queue):
+    """
+    The producer generates data and puts it into the queue.
+    The queue size is limited to 3.
+    """
+    for i in range(5):
+        item = random.randint(1, 100)
+
+        if queue.full():
+            print("Buffer is full! Cannot produce more items.")
+        else:
+            print(f"Producer produced: {item}")
+            queue.put(item)
+
+        time.sleep(random.random())
+
+
+# Consumer Function
+def consumer(queue):
+    """
+    The consumer takes data from the queue and processes it.
+    """
+    for i in range(5):
+        if queue.empty():
+            print("Buffer is empty! Nothing to consume.")
+        else:
+            item = queue.get()
+            print(f"Consumer consumed: {item}")
+
+        time.sleep(random.random())
+
+
+# Main Program
+if __name__ == "__main__":
+
+    # Queue with maximum size 3
+    q = Queue(maxsize=3)
+
+    # Create producer and consumer processes
+    p1 = Process(target=producer, args=(q,))
+    p2 = Process(target=consumer, args=(q,))
+
+    # Start processes
+    p1.start()
+    p2.start()
+
+    # Wait for processes to finish
+    p1.join()
+    p2.join()
+
+    print("Producer and Consumer have finished.")
