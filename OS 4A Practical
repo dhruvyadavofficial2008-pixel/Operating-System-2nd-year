@@ -1,0 +1,70 @@
+processes = ["P1", "P2", "P3", "P4"]
+arrival_time = [0, 1, 2, 3]
+burst_time = [5, 3, 8, 6]
+
+n = len(processes)
+
+waiting_time = [0] * n
+turnaround_time = [0] * n
+completion_time = [0] * n
+
+current_time = 0
+
+print("FCFS Scheduling\n")
+
+for i in range(n):
+    if current_time < arrival_time[i]:
+        current_time = arrival_time[i]
+
+    waiting_time[i] = current_time - arrival_time[i]
+
+    completion_time[i] = current_time + burst_time[i]
+
+    turnaround_time[i] = completion_time[i] - arrival_time[i]
+
+    current_time = completion_time[i]
+
+print("{:<8}{:<12}{:<10}{:<12}{:<15}{:<15}".format(
+    "Process", "Arrival", "Burst", "Waiting", "Turnaround", "Completion"))
+
+for i in range(n):
+    print("{:<8}{:<12}{:<10}{:<12}{:<15}{:<15}".format(
+        processes[i],
+        arrival_time[i],
+        burst_time[i],
+        waiting_time[i],
+        turnaround_time[i],
+        completion_time[i]
+    ))
+
+avg_wt = sum(waiting_time) / n
+avg_tat = sum(turnaround_time) / n
+
+print("\nAverage Waiting Time =", round(avg_wt, 2), "ms")
+print("Average Turnaround Time =", round(avg_tat, 2), "ms")
+
+print("\nGantt Chart:")
+print("---------------------------------------------------------")
+
+time = 0
+chart = "|"
+
+for i in range(n):
+    if time < arrival_time[i]:
+        time = arrival_time[i]
+
+    chart += f" {processes[i]} |"
+    time += burst_time[i]
+
+print(chart)
+
+time = 0
+print("0", end="")
+
+for i in range(n):
+    if time < arrival_time[i]:
+        time = arrival_time[i]
+    time += burst_time[i]
+    print(f"{time:>6}", end="")
+
+print()
