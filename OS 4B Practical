@@ -1,0 +1,76 @@
+processes = ["P1", "P2", "P3", "P4"]
+arrival_time = [0, 2, 4, 5]
+burst_time = [7, 4, 1, 4]
+
+n = len(processes)
+
+completed = [False] * n
+waiting_time = [0] * n
+turnaround_time = [0] * n
+completion_time = [0] * n
+
+current_time = 0
+completed_count = 0
+gantt = []
+
+print("Non-Preemptive SJF Scheduling\n")
+
+while completed_count < n:
+
+    idx = -1
+    shortest = float('inf')
+
+    for i in range(n):
+        if arrival_time[i] <= current_time and not completed[i]:
+            if burst_time[i] < shortest:
+                shortest = burst_time[i]
+                idx = i
+
+    if idx == -1:
+        current_time += 1
+        continue
+
+    waiting_time[idx] = current_time - arrival_time[idx]
+    completion_time[idx] = current_time + burst_time[idx]
+    turnaround_time[idx] = completion_time[idx] - arrival_time[idx]
+
+    gantt.append((processes[idx], current_time, completion_time[idx]))
+
+    current_time = completion_time[idx]
+    completed[idx] = True
+    completed_count += 1
+
+print("{:<8}{:<12}{:<10}{:<12}{:<15}{:<15}".format(
+    "Process", "Arrival", "Burst", "Waiting", "Turnaround", "Completion"))
+
+for i in range(n):
+    print("{:<8}{:<12}{:<10}{:<12}{:<15}{:<15}".format(
+        processes[i],
+        arrival_time[i],
+        burst_time[i],
+        waiting_time[i],
+        turnaround_time[i],
+        completion_time[i]
+    ))
+
+avg_wt = sum(waiting_time) / n
+avg_tat = sum(turnaround_time) / n
+
+print("\nAverage Waiting Time =", round(avg_wt, 2), "ms")
+print("Average Turnaround Time =", round(avg_tat, 2), "ms")
+
+print("\nGantt Chart:")
+print("------------------------------------------")
+
+chart = "|"
+times = [gantt[0][1]]
+
+for p, start, end in gantt:
+    chart += f" {p} |"
+    times.append(end)
+
+print(chart)
+
+for t in times:
+    print(f"{t:<6}", end="")
+print()
