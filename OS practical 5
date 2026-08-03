@@ -1,0 +1,42 @@
+import threading
+
+def generate_fibonacci(n):
+    a, b = 0, 1
+    sequence = []
+
+    for _ in range(n):
+        sequence.append(a)
+        a, b = b, a + b
+
+    return sequence
+
+
+def task(n):
+    result = generate_fibonacci(n)
+    print(f"Fibonacci({n}) = {result}")
+
+
+if __name__ == "__main__":
+
+    print("==========================================")
+    print(" Practical: Multi-threading and Fibonacci ")
+    print(" Name : Dhruv Yadav")
+    print(" Roll No : S123")
+    print("==========================================\n")
+
+    print("Multi-threaded Fibonacci Sequence Generator\n")
+
+    values = [4, 5, 6]
+
+    threads = []
+
+    for n in values:
+        t = threading.Thread(target=task, args=(n,))
+        threads.append(t)
+        t.start()
+
+    for t in threads:
+        t.join()
+
+    print("\nAll threads completed.")
+    print("S123 Dhruv Yadav")
