@@ -1,0 +1,67 @@
+p = [["P1", 0, 5], ["P2", 4, 2], ["P3", 5, 4]]
+q = 2
+
+print("S123 Dhruv Yadav")
+
+def RR():
+    rem = [5, 2, 4]
+    ct = [0, 0, 0]
+    time = 0
+    queue = [0]
+
+    print("\nRound Robin (TQ = 2)")
+    print("Gantt Chart:")
+
+    while queue:
+        i = queue.pop(0)
+        run = min(q, rem[i])
+
+        print(f"{time}-{time+run}: P{i+1}")
+        time += run
+        rem[i] -= run
+
+        for j in range(3):
+            if p[j][1] <= time and rem[j] > 0 and j not in queue:
+                if j != i:
+                    queue.append(j)
+
+        if rem[i] > 0:
+            queue.append(i)
+        else:
+            ct[i] = time
+
+    calc(ct)
+
+
+def FCFS():
+    time = 0
+    ct = []
+
+    print("\nFCFS")
+    print("Gantt Chart:")
+
+    for name, at, bt in p:
+        time = max(time, at)
+        print(f"{time}-{time+bt}: {name}")
+        time += bt
+        ct.append(time)
+
+    calc(ct)
+
+
+def calc(ct):
+    tat = []
+    wt = []
+
+    for i in range(3):
+        t = ct[i] - p[i][1]
+        w = t - p[i][2]
+        tat.append(t)
+        wt.append(w)
+
+    print("Average TAT =", round(sum(tat) / 3, 2), "ms")
+    print("Average WT  =", round(sum(wt) / 3, 2), "ms")
+
+
+RR()
+FCFS()
